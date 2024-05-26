@@ -1,0 +1,5 @@
+.env*
+# dependencies
+.idea
+.next
+/node_modules/
