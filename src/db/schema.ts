@@ -1,4 +1,4 @@
-import { text, pgTable, pgEnum, serial } from "drizzle-orm/pg-core";
+import {text, pgTable, pgEnum, serial, integer} from "drizzle-orm/pg-core";
 
 export const startupStatusEnum = pgEnum("startupStatus", [
   "pending",
@@ -28,7 +28,14 @@ export const consultations = pgTable("consultations", {
   status: consultationStatusEnum("status").notNull().default("pending"),
 });
 
+export const startupMembers = pgTable("startup_members", {
+  startupperId: text("startupperId").notNull(),
+  startupId: integer("consultationId").notNull().references(() => startups.id)
+});
+
 export type Startup = typeof startups.$inferSelect;
 export type Consultation = typeof consultations.$inferSelect;
 export type NewStartup = typeof startups.$inferInsert;
 export type NewConsultation = typeof consultations.$inferInsert;
+export type StartupMember = typeof startupMembers.$inferSelect;
+export type NewStartupMember = typeof startupMembers.$inferInsert;
