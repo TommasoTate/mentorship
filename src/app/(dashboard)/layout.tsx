@@ -56,7 +56,7 @@ export default function RootLayout({
                   {role === 'admin' && <><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href='/admin/users'
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Users2 className="h-5 w-5"/>
@@ -64,10 +64,11 @@ export default function RootLayout({
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent side="right">Users</TooltipContent>
-                  </Tooltip><Tooltip>
+                  </Tooltip>
+                    <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href='/admin/startups'
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Sparkles className="h-5 w-5"/>
@@ -79,7 +80,7 @@ export default function RootLayout({
                     <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href='/admin/consultations'
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <CalendarDays className="h-5 w-5"/>
@@ -91,7 +92,7 @@ export default function RootLayout({
                   {role === 'startupper' && <><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/startupper/mentors"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Brain className="h-5 w-5"/>
@@ -103,7 +104,7 @@ export default function RootLayout({
                     <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/startupper/consultations"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <CalendarDays className="h-5 w-5"/>
@@ -115,7 +116,7 @@ export default function RootLayout({
                   {role === 'startup_admin' && <><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/startup-admin/users"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Users2 className="h-5 w-5"/>
@@ -127,7 +128,7 @@ export default function RootLayout({
                     <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/startup-admin/mentors"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Brain className="h-5 w-5"/>
@@ -138,7 +139,7 @@ export default function RootLayout({
                   </Tooltip><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/startup-admin/consultations"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <CalendarDays className="h-5 w-5"/>
@@ -152,7 +153,7 @@ export default function RootLayout({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                          href="#"
+                          href="/settings"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
                         <Settings className="h-5 w-5" />
@@ -176,21 +177,21 @@ export default function RootLayout({
                       <nav className="grid gap-6 text-lg font-medium">
                         {role === 'admin' && <>
                           <Link
-                            href="#"
+                            href="admin/users"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
                           <Users2 className="h-5 w-5"/>
                           Users
                         </Link>
                           <Link
-                            href="#"
+                            href="admin/startups"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
                           <Sparkles className="h-5 w-5"/>
                           Startups
                         </Link>
                           <Link
-                            href="#"
+                            href="admin/consultations"
                             className="flex items-center gap-4 px-2.5 text-foreground"
                         >
                           <CalendarDays className="h-5 w-5"/>
@@ -199,14 +200,14 @@ export default function RootLayout({
                         </>}
                         {role === 'startupper' && <>
                           <Link
-                              href="#"
+                              href="/startupper/mentors"
                               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                           >
                             <Brain className="h-5 w-5"/>
                             Mentors
                           </Link>
                           <Link
-                              href="#"
+                              href="startupper/consultations"
                               className="flex items-center gap-4 px-2.5 text-foreground"
                           >
                             <CalendarDays className="h-5 w-5"/>
@@ -215,21 +216,21 @@ export default function RootLayout({
                         </>}
                         {role === 'startup_admin' && <>
                           <Link
-                              href="#"
+                              href="/startup-admin/users"
                               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                           >
                             <Users2 className="h-5 w-5"/>
                             Users
                           </Link>
                           <Link
-                              href="#"
+                              href="/startup-admin/mentors"
                               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                           >
                             <Brain className="h-5 w-5"/>
                             Mentors
                           </Link>
                           <Link
-                              href="#"
+                              href="/startup-admin/consultations"
                               className="flex items-center gap-4 px-2.5 text-foreground"
                           >
                             <CalendarDays className="h-5 w-5"/>
@@ -237,7 +238,7 @@ export default function RootLayout({
                           </Link>
                         </>}
                         <Link
-                            href="#"
+                            href="/settings"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
                           <Settings className="h-5 w-5" />
