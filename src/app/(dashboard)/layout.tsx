@@ -4,35 +4,46 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import Link from 'next/link'
 import {
-  Home,
-  LineChart,
-  Package,
-  Package2,
+  Brain,
+  CalendarDays,
   PanelLeft,
   Search,
   Settings,
-  ShoppingCart,
+  Sparkles,
   Users2
 } from 'lucide-react'
-import {Sheet, SheetContent, SheetTrigger} from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger
+} from '@/components/ui/sheet'
 import {Button} from '@/components/ui/button'
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbList,
+  BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import {Input} from '@/components/ui/input'
+import {auth} from '@clerk/nextjs/server'
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const {sessionClaims} = auth()
+  const role =  sessionClaims?.metadata?.role
+
   return (
     <>
             <SignedOut>
@@ -42,73 +53,100 @@ export default function RootLayout({
             <div className="flex min-h-screen w-full flex-col bg-muted/40">
               <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
                 <nav className="flex flex-col items-center gap-4 px-2 py-4">
-                  <Link
-                      href="#"
-                      className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-                  >
-                    <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
-                    <span className="sr-only">Acme Inc</span>
-                  </Link>
-                  <Tooltip>
+                  {role === 'admin' && <><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
                           href="#"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
-                        <Home className="h-5 w-5" />
-                        <span className="sr-only">Dashboard</span>
+                        <Users2 className="h-5 w-5"/>
+                        <span className="sr-only">Users</span>
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Dashboard</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                          href="#"
-                          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8"
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                        <span className="sr-only">Orders</span>
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Orders</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                          href="#"
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                      >
-                        <Package className="h-5 w-5" />
-                        <span className="sr-only">Products</span>
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Products</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
+                    <TooltipContent side="right">Users</TooltipContent>
+                  </Tooltip><Tooltip>
                     <TooltipTrigger asChild>
                       <Link
                           href="#"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
-                        <Users2 className="h-5 w-5" />
-                        <span className="sr-only">Customers</span>
+                        <Sparkles className="h-5 w-5"/>
+                        <span className="sr-only">Startups</span>
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Customers</TooltipContent>
+                    <TooltipContent side="right">Startups</TooltipContent>
                   </Tooltip>
-                  <Tooltip>
+                    <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
                           href="#"
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                       >
-                        <LineChart className="h-5 w-5" />
-                        <span className="sr-only">Analytics</span>
+                        <CalendarDays className="h-5 w-5"/>
+                        <span className="sr-only">Consultations</span>
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Analytics</TooltipContent>
+                    <TooltipContent side="right">Consultations</TooltipContent>
+                  </Tooltip></>}
+                  {role === 'startupper' && <><Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <Brain className="h-5 w-5"/>
+                        <span className="sr-only">Mentors</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Mentors</TooltipContent>
                   </Tooltip>
+                    <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <CalendarDays className="h-5 w-5"/>
+                        <span className="sr-only">Consultations</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Consultations</TooltipContent>
+                  </Tooltip></>}
+                  {role === 'startup_admin' && <><Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <Users2 className="h-5 w-5"/>
+                        <span className="sr-only">Users</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Users</TooltipContent>
+                  </Tooltip>
+                    <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <Brain className="h-5 w-5"/>
+                        <span className="sr-only">Mentors</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Mentors</TooltipContent>
+                  </Tooltip><Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <CalendarDays className="h-5 w-5"/>
+                        <span className="sr-only">Consultations</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Consultations</TooltipContent>
+                  </Tooltip></>}
                 </nav>
                 <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
                   <Tooltip>
@@ -136,46 +174,73 @@ export default function RootLayout({
                     </SheetTrigger>
                     <SheetContent side="left" className="sm:max-w-xs">
                       <nav className="grid gap-6 text-lg font-medium">
-                        <Link
-                            href="#"
-                            className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-                        >
-                          <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
-                          <span className="sr-only">Acme Inc</span>
-                        </Link>
-                        <Link
+                        {role === 'admin' && <>
+                          <Link
                             href="#"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
-                          <Home className="h-5 w-5" />
-                          Dashboard
+                          <Users2 className="h-5 w-5"/>
+                          Users
                         </Link>
-                        <Link
+                          <Link
                             href="#"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
-                          <ShoppingCart className="h-5 w-5" />
-                          Orders
+                          <Sparkles className="h-5 w-5"/>
+                          Startups
                         </Link>
-                        <Link
+                          <Link
                             href="#"
                             className="flex items-center gap-4 px-2.5 text-foreground"
                         >
-                          <Package className="h-5 w-5" />
-                          Products
+                          <CalendarDays className="h-5 w-5"/>
+                          Consultations
                         </Link>
+                        </>}
+                        {role === 'startupper' && <>
+                          <Link
+                              href="#"
+                              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <Brain className="h-5 w-5"/>
+                            Mentors
+                          </Link>
+                          <Link
+                              href="#"
+                              className="flex items-center gap-4 px-2.5 text-foreground"
+                          >
+                            <CalendarDays className="h-5 w-5"/>
+                            Consultations
+                          </Link>
+                        </>}
+                        {role === 'startup_admin' && <>
+                          <Link
+                              href="#"
+                              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <Users2 className="h-5 w-5"/>
+                            Users
+                          </Link>
+                          <Link
+                              href="#"
+                              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <Brain className="h-5 w-5"/>
+                            Mentors
+                          </Link>
+                          <Link
+                              href="#"
+                              className="flex items-center gap-4 px-2.5 text-foreground"
+                          >
+                            <CalendarDays className="h-5 w-5"/>
+                            Consultations
+                          </Link>
+                        </>}
                         <Link
                             href="#"
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
-                          <Users2 className="h-5 w-5" />
-                          Customers
-                        </Link>
-                        <Link
-                            href="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                        >
-                          <LineChart className="h-5 w-5" />
+                          <Settings className="h-5 w-5" />
                           Settings
                         </Link>
                       </nav>
