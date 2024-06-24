@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { neobrutalism } from '@clerk/themes'
 
 export default function RootLayout({
   children,
@@ -8,7 +9,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: neobrutalism,
+      }}
+    >
       <TooltipProvider>
         <html lang="en">
           <body>{children}</body>
