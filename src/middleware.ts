@@ -7,9 +7,13 @@ export default clerkMiddleware((auth, request) => {
   }
   const { userId } = auth()
   if (!userId) {
-    return NextResponse.redirect('http://localhost:3000/sign-in')
+    const response = NextResponse.redirect('http://localhost:3000/sign-in')
+    response.cookies.set('redirect', request.url)
+    return response
   }
-  return NextResponse.next()
+  const response = NextResponse.next()
+  response.cookies.delete('redirect')
+  return response
 })
 
 export const config = {
