@@ -2,9 +2,12 @@ import { clerkMiddleware } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 export default clerkMiddleware((auth, request) => {
-  const { userId, redirectToSignIn } = auth()
+  if (request.url.includes('/sign-in')) {
+    return NextResponse.next()
+  }
+  const { userId } = auth()
   if (!userId) {
-    return redirectToSignIn({ returnBackUrl: request.url })
+    return NextResponse.redirect('http://localhost:3000/sign-in')
   }
   return NextResponse.next()
 })

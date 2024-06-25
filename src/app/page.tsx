@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 export default function Home() {
   const { sessionClaims } = auth()
   const role = sessionClaims?.metadata?.role
+  console.log('role', role)
   if (role === 'admin') redirect('/admin/users')
   if (role === 'startupper') redirect('/startupper/consultations')
   if (role === 'mentor') redirect('/mentor/consultations')
