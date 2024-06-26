@@ -11,7 +11,11 @@ export default clerkMiddleware((auth, request) => {
     response.cookies.set('redirect', request.url)
     return response
   }
-  const response = NextResponse.next()
+  let response = NextResponse.next()
+  let redir = request.cookies.get('redirect')
+  if(redir) {
+    response = NextResponse.redirect(redir.value)
+  }
   response.cookies.delete('redirect')
   return response
 })
