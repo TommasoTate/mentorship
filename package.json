@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix && prettier --write ."
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.1.2",
+    "@clerk/nextjs": "^5.1.6",
     "@clerk/themes": "^2.1.10",
     "@neondatabase/serverless": "^0.9.3",
     "@radix-ui/react-dialog": "^1.0.5",
