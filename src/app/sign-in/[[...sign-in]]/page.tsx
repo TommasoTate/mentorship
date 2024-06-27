@@ -12,7 +12,7 @@ export default function Page() {
     redirectUrl = decodeURIComponent(redirectUrlParam)
     redirectUrl = redirectUrl.replace(window.location.origin, '')
   }
-  console.log('redirectUrl', redirectUrl)
+
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
