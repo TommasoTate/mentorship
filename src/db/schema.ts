@@ -7,6 +7,12 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core'
 
+export const userStatusEnum = pgEnum('startupStatus', [
+  'pending',
+  'approved',
+  'rejected',
+])
+
 export const startupStatusEnum = pgEnum('startupStatus', [
   'pending',
   'approved',
@@ -39,6 +45,8 @@ export const users = pgTable('users', {
   email: text('email').notNull(),
   name: text('name').notNull(),
   role: rolesEnum('role').notNull(),
+  status: userStatusEnum('status').notNull().default('pending'),
+  calendarLink: text('calendarLink'),
   ...timpestampFields,
 })
 
