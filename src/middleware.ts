@@ -3,9 +3,16 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const isOnboardingRoute = createRouteMatcher(['/onboarding'])
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
+const isWebhook = createRouteMatcher(['/api/webhooks/(.*)', '/api/webhooks'])
 
 export default clerkMiddleware((auth, req: NextRequest) => {
   const { userId, sessionClaims, redirectToSignIn } = auth()
+
+  // Allow webhooks to pass through
+  if (isWebhook(req)) {
+    console.log('Webhook request')
+    return NextResponse.next()
+  }
 
   // For users visiting /onboarding, don't try to redirect
   if (userId && isOnboardingRoute(req)) {

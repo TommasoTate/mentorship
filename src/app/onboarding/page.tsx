@@ -1,8 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { motion, AnimatePresence } from 'framer-motion'
 import { completeOnboarding } from './actions'
 import {
   Card,
@@ -12,6 +16,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import {
@@ -24,23 +29,66 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { User } from '@/db/schema'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
+
+const schema = z.object({
+  role: z.enum(['startupper', 'startup-admin', 'mentor'] as const),
+  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  startup: z.string().min(1, 'Please select or enter a startup name'),
+  description: z.string().optional(),
+})
+
+export type OnboardingForm = z.infer<typeof schema>
 
 export default function OnboardingComponent() {
   const { user } = useUser()
   const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (formData: FormData) => {
-    const res = await completeOnboarding(formData)
-    if (res?.message) {
-      await user?.reload()
-      router.push('/')
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<OnboardingForm>({
+    resolver: zodResolver(schema),
+    mode: 'onBlur',
+    defaultValues: {
+      role: 'startupper',
+      fullName: '',
+      startup: '',
+      description: '',
+    },
+  })
+
+  const role = watch('role')
+
+  const onSubmit = async (data: OnboardingForm) => {
+    setIsSubmitting(true)
+    try {
+      const res = await completeOnboarding(data)
+      if (res?.message) {
+        await user?.reload()
+        router.push('/')
+      }
+      if (res?.error) {
+        // handle error
+        console.error(res.error)
+        // You might want to set an error state here and display it to the user
+      }
+    } catch (error) {
+      console.error('An error occurred:', error)
+      // You might want to set an error state here and display it to the user
+    } finally {
+      setIsSubmitting(false)
     }
-    if (res?.error) {
-      // handle error
-    }
+  }
+
+  const handleRoleChange = (
+    newRole: 'startupper' | 'startup-admin' | 'mentor',
+  ) => {
+    setValue('role', newRole)
   }
 
   return (
@@ -48,88 +96,174 @@ export default function OnboardingComponent() {
       <CardHeader>
         <CardTitle>Startup Mentorship Program</CardTitle>
         <CardDescription>
-          Apply to our mentorship program and get personalized guidance to grow
-          your startup.
+          Apply to our mentorship program as a startupper, founder, or mentor.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs defaultValue="startupper">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="startupper">Employee</TabsTrigger>
-            <TabsTrigger value="startup-admin">Founder</TabsTrigger>
-          </TabsList>
-          <div className="mt-6">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="space-y-6">
+          <Tabs
+            value={role}
+            onValueChange={handleRoleChange as (value: string) => void}
+          >
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger
+                value="startupper"
+                className="transition-colors duration-300 ease-in-out"
+              >
+                Employee
+              </TabsTrigger>
+              <TabsTrigger
+                value="startup-admin"
+                className="transition-colors duration-300 ease-in-out"
+              >
+                Founder
+              </TabsTrigger>
+              <TabsTrigger
+                value="mentor"
+                className="transition-colors duration-300 ease-in-out"
+              >
+                Mentor
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="grid gap-4">
             <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" placeholder="Enter your full name" />
+              <Label htmlFor="fullName">Full Name</Label>
+              <Controller
+                name="fullName"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    {...field}
+                  />
+                )}
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.fullName.message}
+                </p>
+              )}
             </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={role}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {role === 'startupper' ? (
+                  <div>
+                    <Label htmlFor="startup">Startup</Label>
+                    <Controller
+                      name="startup"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="startup">
+                            <SelectValue placeholder="Select your startup" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="acme">Acme Inc.</SelectItem>
+                              <SelectItem value="globex">
+                                Globex Corporation
+                              </SelectItem>
+                              <SelectItem value="stark">
+                                Stark Industries
+                              </SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.startup && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.startup.message}
+                      </p>
+                    )}
+                  </div>
+                ) : role === 'startup-admin' ? (
+                  <div>
+                    <Label htmlFor="startup">Startup Name</Label>
+                    <Controller
+                      name="startup"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          id="startup"
+                          placeholder="Enter your startup name"
+                          {...field}
+                        />
+                      )}
+                    />
+                    {errors.startup && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.startup.message}
+                      </p>
+                    )}
+                  </div>
+                ) : null}
+              </motion.div>
+            </AnimatePresence>
+            <AnimatePresence>
+              {(role === 'startup-admin' || role === 'mentor') && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div>
+                    <Label htmlFor="description">
+                      {role === 'startup-admin' ? 'Description' : 'Bio'}
+                    </Label>
+                    <Controller
+                      name="description"
+                      control={control}
+                      render={({ field }) => (
+                        <Textarea
+                          id="description"
+                          placeholder={
+                            role === 'startup-admin'
+                              ? 'Tell us about your experience and goals for the mentorship program'
+                              : 'Share your background and what you can offer as a mentor'
+                          }
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      )}
+                    />
+                    {errors.description && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.description.message}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <AnimatePresence mode="wait">
-            <TabsContent value="startupper" asChild>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="mt-4">
-                  <Label htmlFor="startup">Startup</Label>
-                  <Select>
-                    <SelectTrigger id="startup">
-                      <SelectValue placeholder="Select your startup" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="acme">Acme Inc.</SelectItem>
-                        <SelectItem value="globex">
-                          Globex Corporation
-                        </SelectItem>
-                        <SelectItem value="stark">Stark Industries</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </motion.div>
-            </TabsContent>
-            <TabsContent value="startup-admin" asChild>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <Label htmlFor="startup-name">Startup Name</Label>
-                    <Input
-                      id="startup-name"
-                      placeholder="Enter your startup name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bio">Bio</Label>
-                    <Textarea
-                      id="bio"
-                      placeholder="Tell us about your experience and goals for the mentorship program"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </TabsContent>
-          </AnimatePresence>
-        </Tabs>
-      </CardContent>
-      <CardFooter>
-        <Button
-          type="submit"
-          className="ml-auto"
-          onClick={() => handleSubmit(new FormData())}
-        >
-          Apply
-        </Button>
-      </CardFooter>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="ml-auto" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Apply'
+            )}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   )
 }

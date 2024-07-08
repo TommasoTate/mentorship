@@ -1,4 +1,5 @@
 'use client'
+
 import { SignInButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -10,7 +11,7 @@ export default function Page() {
   const redirectUrlParam = searchParams.get('redirect_url')
   if (redirectUrlParam) {
     redirectUrl = decodeURIComponent(redirectUrlParam)
-    redirectUrl = redirectUrl.replace(window.location.origin, '')
+    redirectUrl = redirectUrl.replace(window?.location?.origin, '')
   }
 
   return (
