@@ -42,8 +42,8 @@ const timpestampFields = {
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
-  email: text('email').notNull(),
-  name: text('name').notNull().unique('email_unique'),
+  email: text('email').notNull().unique('email_unique'),
+  name: text('name').notNull(),
   role: rolesEnum('role'),
   status: userStatusEnum('status').notNull().default('pending'),
   calendarLink: text('calendarLink'),
@@ -53,7 +53,7 @@ export const users = pgTable('users', {
 
 export const startups = pgTable('startups', {
   id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+  name: text('name').notNull().unique('name_unique'),
   description: text('description').notNull(),
   status: startupStatusEnum('status').notNull().default('pending'),
   ...timpestampFields,
