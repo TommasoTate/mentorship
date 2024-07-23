@@ -4,7 +4,7 @@ import {
   pgEnum,
   serial,
   integer,
-  timestamp,
+  timestamp, boolean
 } from 'drizzle-orm/pg-core'
 
 export const userStatusEnum = pgEnum('startupStatus', [
@@ -74,6 +74,7 @@ export const consultations = pgTable('consultations', {
 })
 
 export const startupMembers = pgTable('startup_members', {
+  admin: boolean('admin').notNull().default(false),
   startupperId: integer('startupperId')
     .notNull()
     .references(() => users.id),
