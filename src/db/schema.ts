@@ -4,7 +4,8 @@ import {
   pgEnum,
   serial,
   integer,
-  timestamp, boolean
+  timestamp,
+  boolean,
 } from 'drizzle-orm/pg-core'
 
 export const userStatusEnum = pgEnum('startupStatus', [
