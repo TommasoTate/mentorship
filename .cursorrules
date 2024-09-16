@@ -34,6 +34,8 @@
   
   Key Conventions
   - Use 'nuqs' for URL search parameter state management.
+  - Use 'zod' for form validation.
+  - Use 'next-safe-action' for form submissions.
   - Optimize Web Vitals (LCP, CLS, FID).
   - Limit 'use client':
     - Favor server components and Next.js SSR.
