@@ -6,7 +6,9 @@ import {
   integer,
   timestamp,
   boolean,
+  primaryKey,
 } from 'drizzle-orm/pg-core'
+import { createSelectSchema } from 'drizzle-zod'
 
 export const userStatusEnum = pgEnum('startupStatus', [
   'pending',
@@ -83,7 +85,11 @@ export const startupMembers = pgTable('startup_members', {
     .notNull()
     .references(() => startups.id),
   ...timpestampFields,
-})
+}, (table) => ({
+  pk: primaryKey({columns: [table.startupperId, table.startupId]}),
+}))
+
+export const selectStartupSchema = createSelectSchema(startups)
 
 export type Startup = typeof startups.$inferSelect
 export type NewStartup = typeof startups.$inferInsert
