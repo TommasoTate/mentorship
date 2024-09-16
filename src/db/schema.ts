@@ -76,18 +76,22 @@ export const consultations = pgTable('consultations', {
   ...timpestampFields,
 })
 
-export const startupMembers = pgTable('startup_members', {
-  admin: boolean('admin').notNull().default(false),
-  startupperId: integer('startupperId')
-    .notNull()
-    .references(() => users.id),
-  startupId: integer('startupId')
-    .notNull()
-    .references(() => startups.id),
-  ...timpestampFields,
-}, (table) => ({
-  pk: primaryKey({columns: [table.startupperId, table.startupId]}),
-}))
+export const startupMembers = pgTable(
+  'startup_members',
+  {
+    admin: boolean('admin').notNull().default(false),
+    startupperId: integer('startupperId')
+      .notNull()
+      .references(() => users.id),
+    startupId: integer('startupId')
+      .notNull()
+      .references(() => startups.id),
+    ...timpestampFields,
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.startupperId, table.startupId] }),
+  }),
+)
 
 export const selectStartupSchema = createSelectSchema(startups)
 
