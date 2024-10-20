@@ -1,7 +1,6 @@
 'use client'
 
-import React, { use, useState } from 'react'
-import { SubmitHandler, useForm, UseFormReturn } from 'react-hook-form'
+import React, { use } from 'react'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -10,7 +9,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import { selectStartupSchema, Startup } from '@/db/schema'
+import { Startup } from '@/db/schema'
+import { useHookFormAction } from '@next-safe-action/adapter-react-hook-form/hooks'
 import {
   Form,
   FormControl,
@@ -19,8 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { z } from 'zod'
-import form from './form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Card,
@@ -31,48 +29,46 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { startupperOnboardingAction } from '../actions'
+import { startupperSchema } from '../formSchemas'
+import { useRouter } from 'next/navigation'
 
-const schema = z.object({
-  name: z.string().min(2, 'Full name must be at least 2 characters'),
-  startupId: z.string(),
-  description: z.string(),
-})
-
-export type StartupperFormSchema = z.infer<typeof schema>
-
-export default function StartupperForm({
-  startupsPromise,
-}: {
-  startupsPromise: Promise<Startup[]>
-}) {
-  const startups = use(startupsPromise)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const form = useForm<StartupperFormSchema>({
-    resolver: zodResolver(schema),
-    mode: 'onBlur',
-    defaultValues: {
-      name: '',
-      startupId: '',
-      description: '',
-    },
-  })
-
-  const onSubmit: SubmitHandler<StartupperFormSchema> = async (data) => {
-    setIsSubmitting(true)
-    try {
-      console.log(data)
-    } catch (error) {
-      console.error('An error occurred:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
+const StartupperForm = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    startupsPromise: Promise<Startup[]>
   }
+>(({ startupsPromise }, ref) => {
+  const router = useRouter()
+  const startups = use(startupsPromise)
+  const { handleSubmitWithAction, form } = useHookFormAction(
+    startupperOnboardingAction,
+    zodResolver(startupperSchema),
+    {
+      formProps: {
+        mode: 'onBlur',
+        defaultValues: {
+          name: '',
+          startupId: '',
+          description: '',
+        },
+      },
+      actionProps: {
+        onSuccess: () => {
+          console.log('onSuccess')
+          router.replace('/')
+        },
+        onError: (error) => {
+          console.error('Error:', error)
+        },
+      },
+    },
+  )
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card>
+      <form onSubmit={handleSubmitWithAction}>
+        <Card ref={ref}>
           <CardHeader>
             <CardTitle>Startup Mentorship Program</CardTitle>
           </CardHeader>
@@ -125,8 +121,12 @@ export default function StartupperForm({
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting} className="ml-auto">
-              {isSubmitting ? (
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="ml-auto"
+            >
+              {form.formState.isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Submitting...
@@ -140,4 +140,8 @@ export default function StartupperForm({
       </form>
     </Form>
   )
-}
+})
+
+StartupperForm.displayName = 'StartupperForm'
+
+export default StartupperForm

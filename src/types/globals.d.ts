@@ -1,7 +1,7 @@
 export {}
 
 declare global {
-  type Role = 'admin' | 'startupper' | 'mentor' | 'startup_admin'
+  type Role = 'admin' | 'startupper' | 'mentor' | 'startup-admin'
   type Metadata = {
     role: Role
     onboardingComplete: boolean

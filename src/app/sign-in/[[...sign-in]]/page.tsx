@@ -4,15 +4,21 @@ import { SignInButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useSearchParams } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 export default function Page() {
-  let redirectUrl: string | undefined = undefined
+  const redirectUrl = useRef<string | undefined>(undefined)
   const searchParams = useSearchParams()
   const redirectUrlParam = searchParams.get('redirect_url')
-  if (redirectUrlParam) {
-    redirectUrl = decodeURIComponent(redirectUrlParam)
-    redirectUrl = redirectUrl.replace(window?.location?.origin, '')
-  }
+  useEffect(() => {
+    if (redirectUrlParam) {
+      redirectUrl.current = decodeURIComponent(redirectUrlParam)
+      redirectUrl.current = redirectUrl.current.replace(
+        window?.location?.origin,
+        '',
+      )
+    }
+  }, [redirectUrlParam])
 
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -32,7 +38,7 @@ export default function Page() {
             </Link>
           </p>
         </div>
-        <SignInButton mode={'modal'} forceRedirectUrl={redirectUrl}>
+        <SignInButton mode={'modal'} forceRedirectUrl={redirectUrl.current}>
           <Button className="w-full">Sign in</Button>
         </SignInButton>
       </div>
