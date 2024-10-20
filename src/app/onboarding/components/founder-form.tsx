@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
-import { SubmitHandler, useForm, UseFormReturn } from 'react-hook-form'
+import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -23,43 +22,43 @@ import {
 import { Button } from '@/components/ui/button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useHookFormAction } from '@next-safe-action/adapter-react-hook-form/hooks'
+import { startupAdminOnboardingAction } from '../actions'
+import { founderSchema } from '../formSchemas'
+import { useRouter } from 'next/navigation'
 
-const schema = z.object({
-  name: z.string().min(2, 'Full name must be at least 2 characters'),
-  startupName: z.string().min(3, 'Startup name must be at least 3 characters'),
-  description: z.string(),
-})
-
-export type FounderFormSchema = z.infer<typeof schema>
-
-export default function FounderForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const form = useForm<FounderFormSchema>({
-    resolver: zodResolver(schema),
-    mode: 'onBlur',
-    defaultValues: {
-      name: '',
-      startupName: '',
-      description: '',
+const FounderForm = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>((_, ref) => {
+  const router = useRouter()
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    startupAdminOnboardingAction,
+    zodResolver(founderSchema),
+    {
+      formProps: {
+        mode: 'onBlur',
+        defaultValues: {
+          name: '',
+          startupName: '',
+          description: '',
+        },
+      },
+      actionProps: {
+        onSuccess: (data) => {
+          router.push('/')
+        },
+        onError: (error) => {
+          console.log('onError', error)
+        },
+      },
     },
-  })
-
-  const onSubmit: SubmitHandler<FounderFormSchema> = async (data) => {
-    setIsSubmitting(true)
-    try {
-      console.log(data)
-    } catch (error) {
-      console.error('An error occurred:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  )
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card>
+      <form onSubmit={handleSubmitWithAction}>
+        <Card ref={ref}>
           <CardHeader>
             <CardTitle>Startup Mentorship Program</CardTitle>
           </CardHeader>
@@ -118,8 +117,12 @@ export default function FounderForm() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="ml-auto" disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button
+              type="submit"
+              className="ml-auto"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Submitting...
@@ -133,4 +136,8 @@ export default function FounderForm() {
       </form>
     </Form>
   )
-}
+})
+
+FounderForm.displayName = 'FounderForm'
+
+export default FounderForm

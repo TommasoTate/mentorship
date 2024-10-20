@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
-import * as z from 'zod'
+import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -20,44 +19,44 @@ import {
   CardFooter,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { mentorSchema } from '../formSchemas'
+import { useHookFormAction } from '@next-safe-action/adapter-react-hook-form/hooks'
+import { mentorOnboardingAction } from '../actions'
+import { useRouter } from 'next/navigation'
 
-const schema = z.object({
-  name: z.string().min(2, 'Full name must be at least 2 characters'),
-  description: z.string(),
-})
-
-export type MentorFormSchema = z.infer<typeof schema>
-
-export default function MentorForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const form = useForm<MentorFormSchema>({
-    resolver: zodResolver(schema),
-    mode: 'onBlur',
-    defaultValues: {
-      name: '',
-      description: '',
+const MentorForm = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>((_, ref) => {
+  const router = useRouter()
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    mentorOnboardingAction,
+    zodResolver(mentorSchema),
+    {
+      formProps: {
+        mode: 'onBlur',
+        defaultValues: {
+          name: '',
+          description: '',
+        },
+      },
+      actionProps: {
+        onSuccess: () => {
+          router.push('/')
+        },
+        onError: (error) => {
+          console.error('Error:', error)
+        },
+      },
     },
-  })
-
-  const onSubmit: SubmitHandler<MentorFormSchema> = async (data) => {
-    setIsSubmitting(true)
-    try {
-      console.log(data)
-    } catch (error) {
-      console.error('Error submitting mentor form:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  )
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card>
+      <form onSubmit={handleSubmitWithAction}>
+        <Card ref={ref}>
           <CardHeader>
             <CardTitle>Startup Mentorship Program</CardTitle>
           </CardHeader>
@@ -101,8 +100,12 @@ export default function MentorForm() {
             </>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="ml-auto" disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button
+              type="submit"
+              className="ml-auto"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Submitting...
@@ -116,4 +119,8 @@ export default function MentorForm() {
       </form>
     </Form>
   )
-}
+})
+
+MentorForm.displayName = 'MentorForm'
+
+export default MentorForm

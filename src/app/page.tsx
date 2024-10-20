@@ -9,8 +9,8 @@ export default async function Home() {
   const user = (
     await db.select().from(users).where(eq(users.clerkId, userId!)).limit(1)
   )[0]
-  console.log('role', user.role)
-  if (user.role === 'admin') redirect('/admin/users')
-  if (user.role === 'startupper') redirect('/startupper/consultations')
-  if (user.role === 'mentor') redirect('/mentor/consultations')
+
+  if (user?.role === 'admin') redirect('/admin/users')
+  if (user?.role === 'startupper') redirect('/startupper/consultations')
+  if (user?.role === 'mentor') redirect('/mentor/consultations')
 }

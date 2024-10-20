@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Startup } from '@/db/schema'
 import FounderForm from './founder-form'
 import MentorForm from './mentor-form'
 import StartupperForm from './startupper-form'
-import { AnimatePresence, motion } from 'framer-motion'
+import useMeasure from 'react-use-measure'
+import { TransitionPanel } from '@/components/ui/transition-panel'
 
 export default function OnboardingForm({
   startupsPromise,
@@ -14,71 +15,73 @@ export default function OnboardingForm({
   startupsPromise: Promise<Startup[]>
 }) {
   const [role, setRole] = useState<Role>('mentor')
+  const [ref, { height }] = useMeasure()
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const forms = [MentorForm, FounderForm, StartupperForm]
 
   return (
-    <div className="w-full flex flex-col justify-start max-w-2xl mx-auto space-y-6">
+    <div className="w-full flex flex-col justify-start max-w-2xl mx-auto space-y-6 overflow-hidden p-2 absolute top-36">
       <Tabs value={role} onValueChange={(value) => setRole(value as Role)}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger
             className="transition-colors duration-300 ease-in-out"
             value="mentor"
+            onClick={() => {
+              setActiveIndex(0)
+            }}
           >
             Mentor
           </TabsTrigger>
           <TabsTrigger
             className="transition-colors duration-300 ease-in-out"
-            value="startup_admin"
+            value="startup-admin"
+            onClick={() => {
+              setActiveIndex(1)
+            }}
           >
             Founder
           </TabsTrigger>
           <TabsTrigger
             className="transition-colors duration-300 ease-in-out"
             value="startupper"
+            onClick={() => {
+              setActiveIndex(2)
+            }}
           >
             Employee
           </TabsTrigger>
         </TabsList>
       </Tabs>
-      <div className="relative h-[600px]">
-        <AnimatePresence mode="wait">
-          {role === 'mentor' && (
-            <motion.div
-              key="mentor"
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <MentorForm />
-            </motion.div>
-          )}
-          {role === 'startup_admin' && (
-            <motion.div
-              key="founder"
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <FounderForm />
-            </motion.div>
-          )}
-          {role === 'startupper' && (
-            <motion.div
-              key="startupper"
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <StartupperForm startupsPromise={startupsPromise} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <TransitionPanel
+        activeIndex={activeIndex}
+        variants={{
+          enter: {
+            opacity: 0,
+            height: height > 0 ? height : 'auto',
+            position: 'initial',
+          },
+          center: {
+            zIndex: 1,
+            opacity: 1,
+            height: height > 0 ? height : 'auto',
+          },
+          exit: {
+            zIndex: 0,
+            opacity: 0,
+            position: 'absolute',
+            top: 0,
+            width: '100%',
+          },
+        }}
+        transition={{
+          opacity: { type: 'spring', duration: 0.3 },
+        }}
+      >
+        {forms.map((Form, index) => (
+          <Form ref={ref} key={index} startupsPromise={startupsPromise} />
+        ))}
+      </TransitionPanel>
     </div>
   )
 }
