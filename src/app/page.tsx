@@ -5,7 +5,7 @@ import { users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
 export default async function Home() {
-  const { userId } = auth()
+  const { userId } = await auth()
   const user = (
     await db.select().from(users).where(eq(users.clerkId, userId!)).limit(1)
   )[0]

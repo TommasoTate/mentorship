@@ -27,12 +27,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { auth } from '@clerk/nextjs/server'
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { sessionClaims } = auth()
+  const { sessionClaims } = await auth()
   const role = sessionClaims?.metadata?.role
 
   return (

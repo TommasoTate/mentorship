@@ -5,8 +5,8 @@ const isOnboardingRoute = createRouteMatcher(['/onboarding'])
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
 const isWebhook = createRouteMatcher(['/api/webhooks/(.*)', '/api/webhooks'])
 
-export default clerkMiddleware((auth, req: NextRequest) => {
-  const { userId, sessionClaims, redirectToSignIn } = auth()
+export default clerkMiddleware(async (auth, req: NextRequest) => {
+  const { userId, sessionClaims, redirectToSignIn } = await auth()
 
   // Allow webhooks to pass through
   if (isWebhook(req)) {
