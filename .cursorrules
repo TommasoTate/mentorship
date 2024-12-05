@@ -1,0 +1,173 @@
+Mentorship Web Application Specifications
+
+General Description
+
+App Name: Mentorship
+Purpose: Manage a mentorship program for a startup incubator scenario.
+
+Roles:
+	•	Mentor
+	•	Startup Founder
+	•	Startup Employee
+
+The application connects Mentors with Startup Founders and their Employees, facilitating mentorship session requests, scheduling, and record-keeping of session histories. The goal is to provide a clear, role-based interface where founders can manage their startup teams, employees can request mentorship sessions, and mentors can review and respond to those requests.
+
+Functional Requirements
+
+Common User Capabilities
+
+	•	User Profiles:
+	•	All users (Mentors, Founders, Employees) have profiles with fields: name, email, avatar_url (optional), bio (for mentors/employees), and any role-specific attributes (e.g., mentors’ calendar link).
+	•	Users can update their profiles at any time (bio, avatar, etc.).
+	•	Authentication & Authorization:
+	•	Use 🍋 Clerk for secure user authentication and session management.
+	•	Store user roles (Mentor, Founder, Employee) in the database and associate them with Clerk user IDs for RBAC enforcement.
+	•	Founders can invite new Employees by email, triggering a Clerk invite flow.
+
+Mentor Role
+
+Mentors can:
+	•	Add a calendar link (e.g., Calendly) to their profile to indicate availability.
+	•	Add a detailed bio describing their expertise.
+	•	View incoming mentorship session requests from Startup Founders/Employees.
+	•	Accept or reject session requests.
+	•	View scheduled (upcoming) sessions.
+	•	View past sessions with notes or outcomes.
+
+Startup Employee Role
+
+Startup Employees can:
+	•	Add a bio to their profile.
+	•	Browse a list of mentors, view mentor details (expertise, bio, calendar link).
+	•	Request mentorship sessions by providing date/time preferences and a brief session agenda.
+	•	View upcoming (planned) sessions.
+	•	View past sessions and session notes.
+
+Startup Founder Role
+
+Startup Founders have all the Employee capabilities plus:
+	•	Invite new Startup Employees via email.
+	•	Manage their startup’s profile data: startup_name, logo_url, industry, description, and any key metrics.
+	•	Potentially access aggregated session history or metrics relevant to their startup.
+
+Session Lifecycle and Additional Details
+
+	•	Session Requests:
+	•	Employees or Founders request sessions with Mentors by specifying preferred times, topics, and optional notes.
+	•	Mentors can accept, reject, or propose a different time (if supported).
+	•	Notifications:
+	•	Trigger notifications and emails when:
+	1.	A session is requested by an Employee or Founder.
+	2.	A session is accepted by a Mentor.
+	3.	A session is rejected by a Mentor.
+	•	Notifications appear in a dedicated notification center within the app and are also sent via email.
+	•	Users can view a list of notifications, each indicating the event type and related session details.
+	•	Cancellations and Rescheduling (optional enhancement):
+	•	If desired, specify whether sessions can be canceled or rescheduled and who has the authority to do so (Mentor, Employee/Founder, or both).
+	•	Such actions would also trigger notifications and emails.
+	•	Search and Filtering:
+	•	Employees can filter mentors by expertise, availability, or rating (if implemented).
+	•	Users can filter upcoming or past sessions by date or mentor name.
+
+Technical Requirements
+
+Stack Overview:
+	•	Framework: Next.js (App Router)
+	•	Language: TypeScript
+	•	UI/Styling: Shadcn UI, Radix UI, Tailwind CSS
+	•	Database and ORM: Neon (PostgreSQL) + Drizzle ORM
+	•	Authentication: Clerk
+	•	State Management: Nuqs
+	•	Email and Notifications: Resend + React Email
+
+Code Style and Structure
+
+	•	Use functional, declarative patterns; avoid classes.
+	•	Descriptive variable names (isLoading, hasError, etc.).
+	•	Code organization:
+	•	app/components/ for shared UI components
+	•	db/schema/ for Drizzle schemas
+	•	lib/ for utilities and helper functions
+	•	Keep domain-specific logic in appropriate directories
+	•	Use named exports for components.
+	•	Use TypeScript interfaces for data models; avoid enum in favor of union types or object maps.
+	•	Format with Prettier, lint with ESLint.
+
+TypeScript and Drizzle Integration
+
+	•	Define all schemas using Drizzle in db/schema.
+	•	Represent Users, Roles, Startups, Sessions, and Notifications as TypeScript interfaces aligned with Drizzle’s schema definitions.
+	•	Maintain schema migrations using Drizzle CLI, running them in CI/CD before deployment.
+	•	Ensure schema evolution is tracked and tested.
+
+Database (Neon) and Data Flow
+
+	•	Neon PostgreSQL stores all persistent data (users, sessions, startups, notifications).
+	•	Fetch data in Next.js Server Components via Drizzle queries for minimal client-side complexity.
+	•	Use Next.js server actions for create/update/delete operations (e.g., requesting a session, accepting a session).
+
+Authentication with Clerk
+
+	•	Integrate Clerk to handle sign-up, sign-in, password resets, and session tokens.
+	•	Associate each Clerk user ID with a role and startup ID (if applicable) in the Neon database.
+	•	Ensure protected routes are only accessible to users with appropriate roles.
+
+State Management with Nuqs
+
+	•	Use 🍓 Nuqs for minimal client-side state such as UI toggles or local filters.
+	•	Most data is server-fetched, so global state is minimized.
+	•	Nuqs stores might handle things like the currently selected mentor in the mentors list UI or temporary filter criteria.
+
+UI and Styling
+
+	•	Responsive design with Tailwind CSS.
+	•	Use Shadcn UI and Radix UI to build an accessible, consistent component library.
+	•	Define a design system (colors, typography, spacing) in Tailwind config.
+	•	Implement a notification center UI to list recent notifications.
+
+Notifications and Email Management
+
+	•	Notifications:
+	•	Display notifications in a dedicated in-app notification center.
+	•	Notifications are triggered by specific events (session requested, accepted, rejected).
+	•	Store notifications in the database with references to related users and sessions.
+	•	Email:
+	•	Use 🍇 Resend and 🍉 React Email to send email notifications.
+	•	On triggering events, send a well-structured HTML email built with React Email components.
+	•	Email content includes session details, user info, and a link to view the session in the app.
+	•	Ensure emails are responsive and accessible.
+
+Performance Optimization
+
+	•	Minimize use client directives; rely on server components for data fetching.
+	•	Use <Suspense> and dynamic imports to load non-critical components lazily.
+	•	Optimize images (Next.js Image, WebP format), specify dimensions to avoid layout shifts.
+	•	Monitor and improve Core Web Vitals (LCP, CLS, FID).
+
+Security and Error Handling
+
+	•	Use Clerk for secure authentication and ensure all sensitive routes require proper login.
+	•	Enforce RBAC at the server action level (e.g., only mentors can accept/reject sessions).
+	•	Validate input data (e.g., bios, session requests) on the server.
+	•	Handle errors gracefully with structured JSON error responses, UI fallback states, and toast notifications for form errors.
+
+Startup and Invite Management
+
+	•	Founders invite Employees by email via Clerk’s invitation flow.
+	•	Employees join their startup upon accepting the invite link.
+	•	Startup profiles (logo, description, etc.) managed by the Founder.
+	•	Data is stored in Neon and fetched via Drizzle.
+
+Testing, CI/CD, and Documentation
+
+	•	Testing:
+	•	Jest for unit tests
+	•	React Testing Library for component tests
+	•	Playwright or Cypress for end-to-end tests
+	•	CI/CD:
+	•	Run linting, type checks, and Drizzle migrations in CI.
+	•	Run automated tests before production deployment.
+	•	Documentation:
+	•	README for onboarding (setup, environment variables, running local development).
+	•	Architectural diagrams (ERD for database, component hierarchy).
+	•	Endpoint and server action documentation (potentially OpenAPI/Swagger).
