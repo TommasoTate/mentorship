@@ -8,6 +8,7 @@ export type UserRole = "mentor" | "founder" | "employee";
 
 export async function getCurrentUser() {
   const clerkUser = await currentUser();
+  console.log('clerkUser', clerkUser);
 
   if (!clerkUser) {
     return null;

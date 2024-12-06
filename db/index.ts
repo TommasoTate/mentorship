@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
 
 const sql = neon(process.env.DATABASE_URL!);
-export const db = drizzle(sql, { schema, casing: 'snake_case' });
+export const db = drizzle(sql, { schema, casing: 'camelCase' });
 
 // Helper type for inferring table types
 export type DbClient = typeof db; 

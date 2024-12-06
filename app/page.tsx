@@ -6,6 +6,7 @@ import Link from "next/link";
 export default async function Home() {
   const user = await getCurrentUser();
   const userId = user?.id;
+  console.log('userId', userId);
 
   return (
     <div className="flex min-h-screen flex-col">
